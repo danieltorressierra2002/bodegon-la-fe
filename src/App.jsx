@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "./lib/supabase"
 import { obtenerCarrito, agregarAlCarrito, calcularTotal } from "./lib/carrito"
 
-export default function CatalogoPublico() {
+export default function App() {
   const [categorias, setCategorias] = useState([])
   const [productos, setProductos] = useState([])
   const [categoriaActiva, setCategoriaActiva] = useState(null)
