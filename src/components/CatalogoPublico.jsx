@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { supabase } from "./lib/supabase"
+import { supabase } from "../lib/supabase"
 import { obtenerCarrito, agregarAlCarrito, calcularTotal } from "./lib/carrito"
 
 export default function CatalogoPublico() {
