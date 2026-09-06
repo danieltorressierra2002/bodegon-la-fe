@@ -16,9 +16,7 @@ export default function Login() {
     try {
       await iniciarSesion(email, password)
     } catch (err) {
-      setError("Correo o contraseña 
-
-incorrectos.")
+      setError("Correo o contraseña incorrectos.")
     } finally {
       setCargando(false)
     }
