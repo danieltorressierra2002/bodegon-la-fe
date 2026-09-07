@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../lib/supabase"
 import { useAuth } from "../contexts/AuthContext"
+import * as XLSX from "xlsx"
 
 export default function AdminPanel() {
   const { cerrarSesion } = useAuth()
@@ -51,7 +52,59 @@ return
     setFormProducto({ nombre: "", descripcion: "", precio: "", categoria_id: "", imagen_url: "" })
     cargar()
   }
+async function importarExcel(e) {
+  const archivo = e.target.files?.[0]
+  if (!archivo) return
 
+  const buffer = await archivo.arrayBuffer()
+  const libro = XLSX.read(buffer, { type: "array" })
+  const hoja = libro.Sheets[libro.SheetNames[0]]
+  const filas = XLSX.utils.sheet_to_json(hoja)
+
+  let exitosos = 0
+  let fallidos = 0
+
+  for (const fila of filas) {
+    const nombreCategoria = (fila.categoria || "").toString().trim()
+    let categoriaId = null
+
+    if (nombreCategoria) {
+      const existente = categorias.find(c => c.nombre.toLowerCase() === nombreCategoria.toLowerCase())
+      if (existente) {
+        categoriaId = existente.id
+      } else {
+        const { data: nuevaCat } = await supabase.from("categorias").insert({ nombre: nombreCategoria }).select().single()
+        if (nuevaCat) categoriaId = nuevaCat.id
+      }
+    }
+
+    const nombre = (fila.nombre || "").toString().trim()
+    const precio = Number(fila.precio)
+
+    if (!nombre || isNaN(precio)) {
+      fallidos++
+      continue
+    }
+
+    const disponibleTexto = (fila.disponible || "SI").toString().trim().toUpperCase()
+    const disponible = disponibleTexto === "SI" || disponibleTexto === "SÍ" || disponibleTexto === "TRUE"
+
+    const { error } = await supabase.from("productos").insert({
+      nombre,
+      descripcion: (fila.descripcion || "").toString().trim(),
+      precio,
+      categoria_id: categoriaId,
+      disponible,
+    })
+
+    if (error) fallidos++
+    else exitosos++
+  }
+
+  alert(`Importación terminada: ${exitosos} productos agregados, ${fallidos} con errores.`)
+  e.target.value = ""
+  cargar()
+}
   async function eliminarProducto(id) {
     if (!confirm("¿Eliminar este producto?")) return
     await supabase.from("productos").delete().eq("id", id)
