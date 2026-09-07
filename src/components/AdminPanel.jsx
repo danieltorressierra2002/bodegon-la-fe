@@ -163,6 +163,12 @@ option>
         </section>
 
         <section>
+<label className="block mb-4">
+            <span className="inline-block bg-neutral-800 border border-neutral-700 hover:border-naranja text-sm font-medium px-4 py-2 rounded-lg cursor-pointer">
+              📊 Importar desde Excel
+            </span>
+            <input type="file" accept=".xlsx,.xls" onChange={importarExcel} className="hidden" />
+          </label>
           <h2 className="font-bold text-lg 
 
 mb-3">Productos ({productos.length})</h2>
