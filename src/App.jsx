@@ -22,4 +22,5 @@ export default function App() {
       <AppContent />
     </AuthProvider>
   )
+  
 }
